@@ -1,15 +1,27 @@
 package com.example.devpulse1.agent;
 
+import com.example.devpulse1.log.LogEntity;
+import com.example.devpulse1.log.LogWriter;
+
 public class MethodProfiler {
-    private static final ThreadLocal<Long> startTime = new ThreadLocal<>();
-
     public static void start(String methodName) {
-        startTime.set(System.nanoTime());
-        System.out.println("[DevPulse] " + methodName + "- start");
-    }
-    public static void end(String methodName) {
-        long duration = System.nanoTime() - startTime.get();
-        System.out.printf("[DevPulse] %s - 실행 시간: %.2f ms%n", methodName, duration / 1_000_000.0);
+        CallContext.enter(methodName);
+        ProfilingState.setStart(System.nanoTime());
     }
 
+    public static void end(String methodName) {
+        long end = System.nanoTime();
+        long duration = end - ProfilingState.getStart();
+        double elapsedMs = duration / 1_000_000.0;
+
+        LogWriter.write(new LogEntity(
+                methodName,
+                elapsedMs,
+                CallContext.getDepth(),
+                CallContext.getCurrentTrace()
+        ));
+
+        CallContext.exit();
+        ProfilingState.clear();
+    }
 }
