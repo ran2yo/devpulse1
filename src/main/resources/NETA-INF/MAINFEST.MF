@@ -1,0 +1,3 @@
+Premain-Class: com.example.devpulse1.agent.DevPulseAgent'
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true
