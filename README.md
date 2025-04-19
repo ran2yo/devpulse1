@@ -17,51 +17,52 @@ URL : https://github.com/ran2yo/devpulse1
 
 ## ✅ 현재까지 구현한 내용
 
-- [x] `DevPulseAgent` 클래스에 `premain()` 정의하여 JVM 시작 시 Agent 등록
-- [x] `ClassTransformer`를 통해 JVM 로딩 중인 클래스의 바이트코드 수정
-- [x] ASM(`ClassReader`, `ClassWriter`, `MethodVisitor`) 기반 메서드에 시간 측정 코드 삽입
-- [x] `MethodProfiler`를 통한 `System.nanoTime()` 기반 메서드 실행 시간 측정
-- [x] 콘솔에 로그 출력: `[DevPulse] 메서드명 - 실행 시간: xx.xx ms`
-- [x] `shadowJar` 플러그인으로 fat jar 빌드 구성 완료 (ASM 라이브러리 포함)
-- [x] Agent jar (`*-agent.jar`)와 App jar (`*.jar`) 충돌 문제 해결
-- [x] JVM 옵션으로 `-javaagent` 실행 성공 테스트 완료
+### 🔧 기능 구현
+- [x] `DevPulseAgent`의 `premain()`으로 agent 진입점 설정
+- [x] `ClassTransformer`로 클래스 로딩 시 메서드 바이트코드 변형
+- [x] ASM 기반 `AdviceAdapter`로 메서드 진입/종료 타이밍 삽입
+- [x] `System.nanoTime()`으로 실행 시간 측정 (`MethodProfiler`)
+- [x] 메서드 호출 추적 스택(`CallContext`) 구현
+- [x] 로그 엔트리(`LogEntry`) JSON 객체 구조로 구성
+- [x] 로그 저장 유틸리티(`LogWriter`)로 JSON 파일 저장
+- [x] `include`, `exclude` 패키지 필터링 기능 구현
+- [x] `-javaagent:...=logPath=...,include=...,exclude=...` 파라미터 파싱 완료
+
+### ⚙️ 빌드 및 테스트
+- [x] Spring Boot 모듈과 Agent 모듈 분리 완료
+- [x] `shadowJar`로 fat jar 빌드 구성
+- [x] Agent jar와 App jar의 충돌 문제 해결
+- [x] 샘플 앱으로 로컬 실행 및 로그 출력 테스트 완료
 
 ---
 
 ## 🔜 해야 할 작업 (TODO)
 
-### 🔹 호출 흐름 추적 기능
-- [ ] `CallContext` 구현 (ThreadLocal 기반)
-- [ ] 메서드 진입/종료 시 call stack push/pop
-- [ ] 호출 흐름 트리 출력 가능하도록 구조화
+### 📄 로그 기능 고도화
+- [ ] 로그 파일 날짜별 자동 분리 (예: `devpulse-20250419.json`)
+- [ ] 로그 포맷 선택 기능 (TEXT vs JSON)
+- [ ] 로그 레벨 필드(`INFO`, `DEBUG` 등) 추가
+- [ ] `logs/` 폴더 유무에 따라 자동 생성 처리
+- [ ] 비동기 로깅 처리 (BlockingQueue + 쓰레드)
 
-### 🔹 메모리 사용량 추적
-- [ ] `Runtime.getRuntime()` 기반 메모리 사용량 로그 출력
-- [ ] `MethodProfiler.end()` 단계에서 메모리 측정 병합
+### 📦 설정 및 확장성 개선
+- [ ] YML 기반 config 파일 로딩(`devpulse.yml`)
+- [ ] agentArgs 없이도 설정 가능한 구조 구성
+- [ ] 메서드 이름/어노테이션 기반 필터링 추가
+- [ ] 로그에 환경 정보(OS, JVM 등) 추가
 
-### 🔹 로그 포맷 고도화
-- [ ] 실행 로그를 JSON 형태로 출력
-- [ ] 로그를 콘솔이 아닌 파일(`logs/devpulse.json`)로 저장
-- [ ] 로그 항목에 스레드 ID, 클래스, 호출 깊이(call depth) 포함
+### 📊 분석/시각화
+- [ ] Flame Graph 로그 포맷 변환기 제공
+- [ ] 로그를 Loki, Elasticsearch로 전송 기능
+- [ ] 호출 통계 요약 자동화 (`Top 10 느린 메서드` 등)
 
-### 🔹 후킹 대상 필터링
-- [ ] 포함/제외 패키지 필터 기능 (`include`, `exclude` 지원)
-- [ ] `-javaagent:xxx.jar=include=com.example.*` 형태의 agentArgs 파싱
-
-### 🔹 테스트 환경 및 샘플 앱
-- [ ] `testapp.SampleApp` 모듈 분리 또는 간이 프로젝트 구성
-- [ ] 다양한 후킹 대상 클래스 테스트용 샘플 제공
-
-### 🔹 프로젝트 구조 개선
-- [ ] `agent`, `app` 멀티모듈 구성으로 분리
-- [ ] 모듈 간 의존성 명확화 및 단위 테스트 기반 확장 준비
-
-### 🔹 고급 기능 확장
-- [ ] GC 이벤트 추적 (JFR, GC 로그 분석)
-- [ ] 외부 트레이싱 시스템 연동 설계 (Jaeger, Zipkin 등)
-- [ ] Spring, JDBC 등 프레임워크별 후킹 템플릿 설계
+### 🧪 테스트 및 구조 개선
+- [ ] `testapp` 샘플 프로젝트 정리
+- [ ] agent/app 멀티 모듈 정리 및 문서화
+- [ ] 단위 테스트 기반 설계로 리팩토링
 
 ---
+
 
 ## 🚀 실행 예시
 
